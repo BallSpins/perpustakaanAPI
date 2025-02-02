@@ -1,31 +1,31 @@
 <?php
 
-namespace App\Http\Controllers\User;
+namespace App\Http\Controllers\Book;
 
-use App\Models\Murid;
-use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
+use App\Models\Penulis;
+use Illuminate\Http\Request;
 
-
-class MuridController extends Controller
+class PenulisController extends Controller
 {
-    private $status = ['aktif', 'non aktif'];
-
-    public function index() {
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
         try {
-            $murid = Murid::with('User')->get();
-            if ($murid->isEmpty()) {
+            $penulis = Penulis::all();
+
+            if ($penulis->isEmpty()) {
                 return response()->json([
                     'ok' => false,
                     'message' => 'No data found'
                 ], 404);
             }
-    
+
             $response = [
                 'ok' => true,
-                'murid' => $murid->map(function ($data) {
+                'penulis' => $penulis->map(function ($data) {
                     return $data;
                 })
             ];
@@ -39,52 +39,18 @@ class MuridController extends Controller
         }
     }
 
-    public function show($id) {
-        try {
-            $murid = Murid::with('User')->find($id);
-
-            if (!$murid) {
-                return response()->json([
-                    'ok' => false,
-                    'message' => 'Data with id '. $id . ' doesn\'t exist'
-                ], 404);
-            }
-
-            return response()->json([
-                'ok' => true,
-                'murid' => $murid
-            ], 200);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'ok' => false,
-                'message' => 'Database connection failed: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function store(Request $request) {
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
         try {
             $request->validate([
-                'nama' => 'required|string',
-                'kelas' => 'required|string',
-                'status' => ['required', Rule::in($this->status)],
-                'password' => 'required|string'
+                'nama' => 'required|string'
             ]);
-    
-            $user = User::create([
-                'password' => $request->password
-            ]);
-    
-            $data = [
-                'nama' => $request->nama,
-                'kelas' => $request->kelas,
-                'status' => $request->status,
-                'id_user' => $user->id
-            ];
-    
-            Murid::create($data);
-    
+
+            Penulis::create($request->all());
+
             return response()->json([
                 'ok' => true,
                 'message' => 'Data inserted successfully'
@@ -97,25 +63,53 @@ class MuridController extends Controller
         }
     }
 
-    public function update(Request $request, $id) {
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
         try {
-            $request->validate([
-                'nama' => 'required|string',
-                'kelas' => 'required|string',
-                'status' => ['required', Rule::in($this->status)],
-                'password' => 'required|string'
-            ]);
+            $penulis = Penulis::find($id);
 
-            $murid = Murid::with('User')->find($id);
-
-            if (!$murid) {
+            if (!$penulis) {
                 return response()->json([
                     'ok' => false,
                     'message' => 'Data with id '. $id . ' doesn\'t exist'
                 ], 404);
             }
 
-            $murid->update($request->all());
+            return response()->json([
+                'ok' => true,
+                'penulis' => $penulis
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Database connection failed: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        try {
+            $penulis = Penulis::find($id);
+            
+            if (!$penulis) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'Data with id '. $id . ' doesn\'t exist'
+                ], 404);
+            }
+
+            $request->validate([
+                'nama' => 'required|string'
+            ]);
+
+            $penulis->update($request->all());
 
             return response()->json([
                 'ok' => true,
@@ -128,22 +122,23 @@ class MuridController extends Controller
             ], 500);
         }
     }
-    
-    public function destroy($id) {
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
         try {
-            $murid = Murid::with('User')->find($id);
+            $penulis = Penulis::find($id);
             
-            if (!$murid) {
+            if (!$penulis) {
                 return response()->json([
                     'ok' => false,
                     'message' => 'Data with id '. $id . ' doesn\'t exist'
                 ], 404);
             }
 
-            $user = User::find($murid->id_user);
-
-            $user->delete();
-            $murid->delete();
+            $penulis->delete();
             
             return response()->json([
                 'ok' => true,

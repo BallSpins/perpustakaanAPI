@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Book;
 
 use App\Http\Controllers\Controller;
+use App\Models\Penerbit;
 use Illuminate\Http\Request;
 
 class PenerbitController extends Controller
@@ -12,15 +13,30 @@ class PenerbitController extends Controller
      */
     public function index()
     {
-        //
-    }
+        try {
+            $penerbit = Penerbit::all();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+            if ($penerbit->isEmpty()) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'No data found'
+                ], 404);
+            }
+
+            $response = [
+                'ok' => true,
+                'penerbit' => $penerbit->map(function ($data) {
+                    return $data;
+                })
+            ];
+    
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Database connection failed: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -28,7 +44,23 @@ class PenerbitController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $request->validate([
+                'nama' => 'required|string'
+            ]);
+
+            Penerbit::create($request->all());
+
+            return response()->json([
+                'ok' => true,
+                'message' => 'Data inserted successfully'
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Database connection failed: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -36,15 +68,26 @@ class PenerbitController extends Controller
      */
     public function show(string $id)
     {
-        //
-    }
+        try {
+            $penerbit = Penerbit::find($id);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+            if (!$penerbit) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'Data with id '. $id . ' doesn\'t exist'
+                ], 404);
+            }
+
+            return response()->json([
+                'ok' => true,
+                'penerbit' => $penerbit
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Database connection failed: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -52,7 +95,32 @@ class PenerbitController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        try {
+            $penerbit = Penerbit::find($id);
+            
+            if (!$penerbit) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'Data with id '. $id . ' doesn\'t exist'
+                ], 404);
+            }
+
+            $request->validate([
+                'nama' => 'required|string'
+            ]);
+
+            $penerbit->update($request->all());
+
+            return response()->json([
+                'ok' => true,
+                'message' => 'Data updated successfully'
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Database connection failed: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -60,6 +128,27 @@ class PenerbitController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $penerbit = Penerbit::find($id);
+            
+            if (!$penerbit) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'Data with id '. $id . ' doesn\'t exist'
+                ], 404);
+            }
+
+            $penerbit->delete();
+            
+            return response()->json([
+                'ok' => true,
+                'message' => 'Data deleted successfully'
+            ], 204);
+        } catch (\Exception $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Database connection failed: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
