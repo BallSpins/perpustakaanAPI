@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\GuruController;
-use App\Http\Controllers\MuridController;
-use App\Http\Controllers\PetugasController;
+use App\Http\Controllers\User\GuruController;
+use App\Http\Controllers\User\MuridController;
+use App\Http\Controllers\User\PetugasController;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/user', function (Request $request) {

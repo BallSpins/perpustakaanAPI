@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Penerbit extends Model
 {
     protected $table = 'penerbit';
+    public $timestamps = false;
+
     protected $fillable = ['nama'];
 
     public function Buku() {

@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Penulis extends Model
 {
     protected $table = 'penulis';
+    public $timestamps = false;
+
     protected $fillable = ['nama'];
 
     public function Buku() {
