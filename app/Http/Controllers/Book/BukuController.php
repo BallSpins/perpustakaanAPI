@@ -32,7 +32,24 @@ class BukuController extends Controller
             $response = [
                 'ok' => true,
                 'buku' => $buku->map(function ($data) {
-                    return $data;
+                    return [
+                        'id' => $data->id,
+                        'judul' => $data->judul,
+                        'id_penerbit' => $data->id_penerbit,
+                        'tgl_terbit' => $data->tgl_terbit,
+                        'id_penulis' => $data->id_penulis,
+                        'stock' => $data->stock,
+                        'kategori_buku' => $data->KategoriBuku->map(function ($kb) {
+                            return [
+                                "id" => $kb->id,
+                                "id_buku" => $kb->id_buku,
+                                "id_kategori" => $kb->id_kategori,
+                                "nama" => Kategori::where('id', $kb->id_kategori)->pluck('nama')
+                            ];
+                        }),
+                        'penulis' => $data->Penulis,
+                        'penerbit' => $data->Penerbit
+                    ];
                 })
             ];
     
@@ -130,7 +147,24 @@ class BukuController extends Controller
     
             return response()->json([
                 'ok' => true,
-                'buku' => $buku
+                'buku' => [
+                        'id' => $buku->id,
+                        'judul' => $buku->judul,
+                        'id_penerbit' => $buku->id_penerbit,
+                        'tgl_terbit' => $buku->tgl_terbit,
+                        'id_penulis' => $buku->id_penulis,
+                        'stock' => $buku->stock,
+                        'kategori_buku' => $buku->KategoriBuku->map(function ($kb) {
+                            return [
+                                "id" => $kb->id,
+                                "id_buku" => $kb->id_buku,
+                                "id_kategori" => $kb->id_kategori,
+                                "nama" => Kategori::where('id', $kb->id_kategori)->pluck('nama')
+                            ];
+                        }),
+                        'penulis' => $buku->Penulis,
+                        'penerbit' => $buku->Penerbit
+                    ]
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -204,9 +238,13 @@ class BukuController extends Controller
                 'id_kategori' => $request->id_kategori
             ];
 
-            $KategoriBuku = KategoriBuku::find($request->id_buku);
+            $KategoriBuku = KategoriBuku::where('id_buku', $buku->id)->first();
 
-            $KategoriBuku->update($dataKategoriBuku);
+            if ($KategoriBuku) {
+                $KategoriBuku->update($dataKategoriBuku);
+            } else {
+                KategoriBuku::create($dataKategoriBuku);
+            }
 
             return response()->json([
                 'ok' => true,
@@ -236,9 +274,16 @@ class BukuController extends Controller
             }
 
             $KategoriBuku = KategoriBuku::find($id);
+            if($KategoriBuku) {
+                $KategoriBuku->delete();
+            }
 
-            optional($KategoriBuku->delete());
             $buku->delete();
+
+            return response()->json([
+                'ok' => true,
+                'message' => 'Data deleted successfully'
+            ], 204);
         } catch (\Exception $e) {
             return response()->json([
                 'ok' => false,
