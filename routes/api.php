@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Book\BukuController;
+use App\Http\Controllers\Book\KategoriController;
 use App\Http\Controllers\Book\PenerbitController;
 use App\Http\Controllers\Book\PenulisController;
 use App\Http\Controllers\User\GuruController;
@@ -21,6 +23,8 @@ Route::prefix('user')->group(function() {
 Route::prefix('book')->group(function() {
     Route::resource('penerbit', PenerbitController::class);
     Route::resource('penulis', PenulisController::class);
+    Route::resource('kategori', KategoriController::class);
+    Route::resource('buku', BukuController::class);
 });
 
 Route::any('{any}', function () {

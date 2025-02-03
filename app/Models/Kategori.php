@@ -10,4 +10,8 @@ class Kategori extends Model
     public $timestamps = false;
 
     protected $fillable = ['nama'];
+
+    public function KategoriBuku() {
+        return $this->hasMany(KategoriBuku::class);
+    }
 }

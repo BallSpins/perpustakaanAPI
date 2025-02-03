@@ -14,10 +14,14 @@ class Buku extends Model
     protected $fillable = ['judul', 'id_penerbit', 'tgl_terbit', 'id_penulis', 'stock'];
 
     public function Penerbit() {
-        return $this->belongsTo(Penerbit::class);
+        return $this->belongsTo(Penerbit::class, 'id_penerbit');
     }
 
     public function Penulis() {
-        return $this->belongsTo(Penulis::class);
+        return $this->belongsTo(Penulis::class, 'id_penulis');
+    }
+
+    public function KategoriBuku() {
+        return $this->hasMany(KategoriBuku::class, 'id_buku');
     }
 }
